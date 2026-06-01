@@ -51,6 +51,66 @@ function recordInstall(skill, target, result) {
   return record;
 }
 
+function claudeSkillsDir() {
+  return path.join(os.homedir(), '.claude', 'skills');
+}
+
+function parseFrontmatter(text) {
+  const out = {};
+  if (!text || text.slice(0, 3) !== '---') return out;
+  const end = text.indexOf('\n---', 3);
+  if (end === -1) return out;
+  text.slice(3, end).split('\n').forEach(function (line) {
+    const m = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+    if (m) out[m[1].toLowerCase()] = m[2].trim().replace(/^["']|["']$/g, '');
+  });
+  return out;
+}
+
+function countFiles(dir) {
+  let n = 0;
+  try {
+    fs.readdirSync(dir, { withFileTypes: true }).forEach(function (e) {
+      if (e.isDirectory()) n += countFiles(path.join(dir, e.name));
+      else n += 1;
+    });
+  } catch (e) { /* ignore */ }
+  return n;
+}
+
+function scanClaudeCodeSkills() {
+  const base = claudeSkillsDir();
+  const out = [];
+  let entries;
+  try { entries = fs.readdirSync(base, { withFileTypes: true }); } catch (e) { return out; }
+  entries.forEach(function (e) {
+    if (!e.isDirectory() || e.name.charAt(0) === '.') return;
+    const dir = path.join(base, e.name);
+    const mdPath = path.join(dir, 'SKILL.md');
+    let fm = {};
+    try { fm = parseFrontmatter(fs.readFileSync(mdPath, 'utf8')); } catch (err) { return; }
+    let stat = null;
+    try { stat = fs.statSync(dir); } catch (err) { /* ignore */ }
+    const name = fm.name || e.name;
+    out.push({
+      key: 'cc-disk:' + e.name,
+      name: name,
+      title: name,
+      description: fm.description || '',
+      category: fm.category || '',
+      categoryLabel: fm.category || 'General',
+      source: null,
+      htmlUrl: '',
+      target: 'code',
+      path: dir,
+      fileCount: countFiles(dir),
+      installedAt: stat ? (stat.birthtimeMs || stat.ctimeMs || stat.mtimeMs) : 0,
+      external: true
+    });
+  });
+  return out;
+}
+
 function listInstalled() {
   const list = readRegistry();
   let changed = false;
@@ -60,10 +120,18 @@ function listInstalled() {
     if (r.missing !== !exists) { r.missing = !exists; changed = true; }
   });
   if (changed) writeRegistry(list);
-  return list.slice().sort(function (a, b) { return (b.installedAt || 0) - (a.installedAt || 0); });
+  const known = {};
+  list.forEach(function (r) { if (r.target === 'code' && r.path) known[path.resolve(r.path)] = true; });
+  const external = scanClaudeCodeSkills().filter(function (r) { return !known[path.resolve(r.path)]; });
+  return list.concat(external).sort(function (a, b) { return (b.installedAt || 0) - (a.installedAt || 0); });
 }
 
 function uninstall(key) {
+  if (typeof key === 'string' && key.indexOf('cc-disk:') === 0) {
+    const dir = path.join(claudeSkillsDir(), key.slice('cc-disk:'.length));
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* ignore */ }
+    return { ok: true };
+  }
   const list = readRegistry();
   const record = list.find(function (r) { return r.key === key; });
   if (record) {
