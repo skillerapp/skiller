@@ -292,7 +292,7 @@ async function exportZipForClaude(skill) {
   let dest = path.join(dir, name + '.zip');
   try { fs.mkdirSync(dir, { recursive: true }); } catch (e) { dest = path.join(os.tmpdir(), name + '.zip'); }
   fs.writeFileSync(dest, zip);
-  const result = { ok: true, path: dest, fileCount: files.length, settingsUrl: 'https://claude.ai/settings/capabilities' };
+  const result = { ok: true, path: dest, fileCount: files.length, settingsUrl: 'https://claude.ai/customize/skills' };
   recordInstall(skill, 'claude', result);
   return result;
 }

@@ -115,9 +115,9 @@
         </div>
     </div>
 
-    <div id="confirm" class="fixed inset-0 z-[250] hidden">
-        <div data-confirm-backdrop class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-        <div class="absolute left-1/2 top-1/2 w-[calc(100%-3rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 animate-rise rounded-2xl border border-[#E7E4DA] bg-[#F5F4EE] p-6 shadow-2xl dark:border-white/10 dark:bg-[#201E1C]">
+    <div id="confirm" class="fixed inset-0 z-[250] hidden grid place-content-center justify-items-center p-6">
+        <div data-confirm-backdrop class="fixed inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative w-[24rem] max-w-full animate-rise rounded-2xl border border-[#E7E4DA] bg-[#F5F4EE] p-6 shadow-2xl dark:border-white/10 dark:bg-[#201E1C]">
             <h2 class="font-serif text-2xl">Are you sure?</h2>
             <p data-confirm-msg class="mt-2 text-sm leading-relaxed text-[#6F6C63] dark:text-[#A6A296]"></p>
             <div class="mt-6 flex justify-end gap-2">
@@ -201,6 +201,24 @@
         let rendered = [];
         let installed = [];
         const state = { tab: 'explore', category: 'all', query: '', data: null, loading: true, error: null, catExpanded: false };
+
+        const confirmEl = document.getElementById('confirm');
+        const confirmMsg = confirmEl.querySelector('[data-confirm-msg]');
+        const confirmOk = confirmEl.querySelector('[data-confirm-ok]');
+        const confirmCancel = confirmEl.querySelector('[data-confirm-cancel]');
+        const confirmBackdrop = confirmEl.querySelector('[data-confirm-backdrop]');
+        let confirmResolve = null;
+        function closeConfirm(val) { confirmEl.classList.add('hidden'); if (confirmResolve) { const r = confirmResolve; confirmResolve = null; r(val); } }
+        function askConfirm(msg, okLabel) {
+            confirmMsg.textContent = msg;
+            confirmOk.textContent = okLabel || 'Confirm';
+            confirmEl.classList.remove('hidden');
+            return new Promise(function (res) { confirmResolve = res; });
+        }
+        confirmOk.addEventListener('click', function () { closeConfirm(true); });
+        confirmCancel.addEventListener('click', function () { closeConfirm(false); });
+        confirmBackdrop.addEventListener('click', function () { closeConfirm(false); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !confirmEl.classList.contains('hidden')) closeConfirm(false); });
 
         const TAB_ACTIVE = 'bg-black/[0.07] text-[#1F1E1D] dark:bg-white/10 dark:text-[#F2EFE7]';
         const TAB_IDLE = 'text-[#6F6C63] hover:text-[#1F1E1D] dark:text-[#A6A296] dark:hover:text-[#F2EFE7]';
@@ -427,7 +445,7 @@
                     '<div class="mt-5 flex items-center justify-end gap-2">' +
                         (r.htmlUrl ? '<button data-inst-github data-url="' + esc(r.htmlUrl) + '" aria-label="View on GitHub" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-brands fa-github text-sm"></i></button>' : '') +
                         (r.missing ? '' : '<button data-inst-reveal data-path="' + esc(r.path) + '" aria-label="Show in folder" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-regular fa-folder-open text-sm"></i></button>') +
-                        '<button data-inst-remove data-key="' + esc(r.key) + '" class="inline-flex items-center gap-1.5 rounded-full border border-[#E7E4DA] px-4 py-1.5 text-xs font-semibold text-[#6F6C63] transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-600 active:scale-95 dark:border-white/10 dark:text-[#A6A296]"><i class="fa-solid fa-trash-can text-[11px]"></i>' + (r.target === 'code' ? 'Uninstall' : 'Remove') + '</button>' +
+                        '<button data-inst-remove data-key="' + esc(r.key) + '" data-name="' + esc(r.title) + '" data-target="' + esc(r.target) + '" class="inline-flex items-center gap-1.5 rounded-full border border-[#E7E4DA] px-4 py-1.5 text-xs font-semibold text-[#6F6C63] transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-600 active:scale-95 dark:border-white/10 dark:text-[#A6A296]"><i class="fa-solid fa-trash-can text-[11px]"></i>' + (r.target === 'code' ? 'Uninstall' : 'Remove') + '</button>' +
                     '</div>' +
                 '</article>';
         }
@@ -459,18 +477,14 @@
                 b.addEventListener('click', function () { api.revealPath(b.getAttribute('data-path')); });
             });
             viewInstalled.querySelectorAll('[data-inst-remove]').forEach(function (b) {
-                const origHtml = b.innerHTML;
-                const origCls = b.className;
-                let armed = false, timer = null;
                 b.addEventListener('click', async function () {
-                    if (!armed) {
-                        armed = true;
-                        b.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-[11px]"></i>Confirm?';
-                        b.className = 'inline-flex items-center gap-1.5 rounded-full border border-red-500/50 bg-red-500/10 px-4 py-1.5 text-xs font-semibold text-red-600 transition active:scale-95 dark:text-red-400';
-                        timer = window.setTimeout(function () { armed = false; b.innerHTML = origHtml; b.className = origCls; }, 3000);
-                        return;
-                    }
-                    window.clearTimeout(timer);
+                    const name = b.getAttribute('data-name') || 'this skill';
+                    const isCode = b.getAttribute('data-target') === 'code';
+                    const msg = isCode
+                        ? 'This will delete “' + name + '” from your Claude Code skills. This cannot be undone.'
+                        : 'This will remove the downloaded package for “' + name + '”.';
+                    const ok = await askConfirm(msg, isCode ? 'Uninstall' : 'Remove');
+                    if (!ok) return;
                     b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                     await api.uninstall(b.getAttribute('data-key'));
                     await loadInstalled();

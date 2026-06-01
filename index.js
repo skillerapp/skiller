@@ -4,6 +4,7 @@ const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-title
 const settings = require('./src/main/settings');
 const marketplace = require('./src/main/marketplace');
 const install = require('./src/main/install');
+const claudeInstall = require('./src/main/claude-install');
 
 setupTitlebar();
 
@@ -63,8 +64,7 @@ ipcMain.handle('install:code', async function (e, skill) {
 
 ipcMain.handle('install:claude', async function (e, skill) {
   const res = await install.exportZipForClaude(skill);
-  if (res && res.path) shell.showItemInFolder(res.path);
-  if (res && res.settingsUrl) shell.openExternal(res.settingsUrl);
+  if (res && res.path) await claudeInstall.installToClaude(res.path);
   return res;
 });
 
