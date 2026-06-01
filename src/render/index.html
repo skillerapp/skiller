@@ -30,7 +30,7 @@
     <style>
         body { font-optical-sizing: auto; }
         .cet-container { overflow-y: scroll !important; }
-        .cet-titlebar { z-index: 70; }
+        .cet-titlebar { z-index: 70; background: transparent !important; }
         @media (prefers-color-scheme: dark) { .cet-icon { filter: invert(1) brightness(1.7); } }
         .grain::before {
             content: "";
@@ -98,7 +98,7 @@
     <div id="settings" class="fixed inset-0 z-[200] hidden">
         <div id="settings-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
         <div class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-[#E7E4DA] bg-[#F5F4EE] shadow-2xl dark:border-white/10 dark:bg-[#201E1C]">
-            <div class="flex items-center justify-between border-b border-[#E7E4DA] px-6 py-5 dark:border-white/10">
+            <div class="flex items-center justify-between border-b border-[#E7E4DA] px-6 pb-5 pt-12 dark:border-white/10">
                 <h2 class="font-serif text-2xl">Skill repositories</h2>
                 <button id="settings-close" class="grid h-8 w-8 place-content-center rounded-full text-[#6F6C63] transition hover:bg-black/5 dark:text-[#A6A296] dark:hover:bg-white/5"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -118,6 +118,15 @@
     <div id="offline-banner" class="hidden fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/10 bg-[#1F1E1D] px-5 py-3 text-sm tracking-wide text-white shadow-2xl dark:bg-[#2A2724]">
         No internet connection — the app will not work
     </div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        ['loader', 'settings', 'offline-banner'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el && el.parentNode !== document.body) document.body.appendChild(el);
+        });
+    });
+</script>
 
 <script>
     const offlineBanner = document.getElementById('offline-banner');
@@ -484,9 +493,18 @@
         const input = document.getElementById('repo-input');
         let dirty = false;
 
+        function repoLabel(url) {
+            let s = String(url || '').trim().replace(/\.git$/i, '').replace(/\/+$/, '');
+            const m = s.match(/github\.com[/:]([^/]+)\/([^/]+)/i);
+            if (m) return m[1] + '/' + m[2];
+            const parts = s.split('/').filter(Boolean);
+            if (parts.length >= 2) return parts[parts.length - 2] + '/' + parts[parts.length - 1];
+            return s;
+        }
         function repoRow(url) {
+            const label = repoLabel(url);
             return '<div class="flex items-center justify-between gap-2 rounded-xl border border-[#E7E4DA] bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-[#252320]">' +
-                '<span class="truncate font-medium" title="' + url.replace(/"/g, '&quot;') + '"><i class="fa-brands fa-github mr-2 text-[#9C988D]"></i>' + url.replace(/</g, '&lt;') + '</span>' +
+                '<span class="truncate font-medium" title="' + label.replace(/"/g, '&quot;') + '"><i class="fa-brands fa-github mr-2 text-[#9C988D]"></i>' + label.replace(/</g, '&lt;') + '</span>' +
                 '<button data-remove="' + url.replace(/"/g, '&quot;') + '" class="grid h-7 w-7 shrink-0 place-content-center rounded-full text-[#9C988D] transition hover:bg-red-500/10 hover:text-red-500"><i class="fa-solid fa-trash-can text-xs"></i></button>' +
                 '</div>';
         }
