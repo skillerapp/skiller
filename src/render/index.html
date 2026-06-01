@@ -211,10 +211,9 @@
         const a = e.target.closest && e.target.closest('a[href]');
         if (!a) return;
         const href = a.getAttribute('href') || '';
-        if (/^https?:\/\//i.test(href)) {
-            e.preventDefault();
-            if (window.skiller) window.skiller.openExternal(href);
-        }
+        if (!href || href.charAt(0) === '#') return;
+        e.preventDefault();
+        if (/^https?:\/\//i.test(href) && window.skiller) window.skiller.openExternal(href);
     });
 </script>
 

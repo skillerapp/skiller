@@ -18,6 +18,8 @@ if (process.platform === 'darwin') {
   Menu.setApplicationMenu(null);
 }
 
+let mainWindow = null;
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1270,
@@ -31,6 +33,8 @@ function createWindow() {
       sandbox: false,
     },
   });
+  mainWindow = win;
+  win.on('closed', function () { if (mainWindow === win) mainWindow = null; });
 
   win.loadFile(path.join(__dirname, 'src/render', 'index.html'));
   attachTitlebarToWindow(win);
@@ -40,9 +44,24 @@ function createWindow() {
     return { action: 'deny' };
   });
   win.webContents.on('will-navigate', function (e, url) {
-    if (!/^file:\/\//.test(url)) {
+    e.preventDefault();
+    if (/^https?:\/\//.test(url)) shell.openExternal(url);
+  });
+
+  win.webContents.on('before-input-event', function (e, input) {
+    if (input.type !== 'keyDown') return;
+    const mod = process.platform === 'darwin' ? input.meta : input.control;
+    if (!mod) return;
+    const wc = win.webContents;
+    if (input.key === '=' || input.key === '+') {
+      wc.setZoomFactor(Math.min(wc.getZoomFactor() + 0.1, 3));
       e.preventDefault();
-      if (/^https?:\/\//.test(url)) shell.openExternal(url);
+    } else if (input.key === '-' || input.key === '_') {
+      wc.setZoomFactor(Math.max(wc.getZoomFactor() - 0.1, 0.3));
+      e.preventDefault();
+    } else if (input.key === '0') {
+      wc.setZoomFactor(1);
+      e.preventDefault();
     }
   });
 }
@@ -132,7 +151,10 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.show();
+    mainWindow.focus();
+  } else {
     createWindow();
   }
 });
