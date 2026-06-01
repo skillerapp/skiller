@@ -28,6 +28,7 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
+        html { overflow-y: scroll; }
         body { font-optical-sizing: auto; }
         .grain::before {
             content: "";
@@ -53,31 +54,43 @@
 
     <main class="mx-auto max-w-5xl px-6 pb-24 pt-10">
         <div class="flex items-center justify-between gap-4">
-            <div class="flex min-w-0 items-center gap-3">
-                <img src="../img/icon.svg" alt="" class="h-8 w-8 shrink-0 select-none dark:invert" draggable="false" />
-                <h1 class="font-serif text-3xl tracking-tight">Skiller</h1>
+            <div class="flex min-w-0 items-center gap-5">
+                <div class="flex min-w-0 items-center gap-3">
+                    <img src="../img/icon.svg" alt="" class="h-8 w-8 shrink-0 select-none dark:invert" draggable="false" />
+                    <h1 class="font-serif text-3xl tracking-tight">Skiller</h1>
+                </div>
+                <nav class="flex items-center gap-1 rounded-full border border-[#E7E4DA] bg-white p-1 dark:border-white/10 dark:bg-[#252320]">
+                    <button data-tab="explore" class="rounded-full px-3.5 py-1.5 text-sm font-medium transition">Explore</button>
+                    <button data-tab="installed" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition">Installed Skills<span data-installed-count class="hidden min-w-[1.25rem] rounded-full bg-black/8 px-1.5 text-center text-[11px] font-semibold dark:bg-white/12"></span></button>
+                </nav>
             </div>
             <div class="flex shrink-0 items-center gap-2">
-                <div class="relative w-44 sm:w-56">
-                    <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-[#9C988D]"></i>
-                    <input id="search" type="text" placeholder="Search skills…" class="w-full rounded-full border border-[#E7E4DA] bg-white py-2 pl-9 pr-3 text-sm outline-none transition placeholder:text-[#9C988D] focus:border-[#C96442] focus:ring-4 focus:ring-[#C96442]/15 dark:border-white/10 dark:bg-[#252320] dark:focus:ring-[#D97757]/15" />
+                <div id="explore-actions" class="flex items-center gap-2">
+                    <div class="relative w-44 sm:w-56">
+                        <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-[#9C988D]"></i>
+                        <input id="search" type="text" placeholder="Search skills…" class="w-full rounded-full border border-[#E7E4DA] bg-white py-2 pl-9 pr-3 text-sm outline-none transition placeholder:text-[#9C988D] focus:border-[#C96442] focus:ring-4 focus:ring-[#C96442]/15 dark:border-white/10 dark:bg-[#252320] dark:focus:ring-[#D97757]/15" />
+                    </div>
+                    <button id="btn-refresh" title="Refresh" class="grid h-9 w-9 shrink-0 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-solid fa-rotate text-sm"></i></button>
                 </div>
-                <button id="btn-refresh" title="Refresh" class="grid h-9 w-9 shrink-0 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-solid fa-rotate text-sm"></i></button>
                 <button id="btn-settings" title="Skill repositories" class="grid h-9 w-9 shrink-0 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-solid fa-sliders text-sm"></i></button>
             </div>
         </div>
 
-        <div id="filterbar" class="mt-8 hidden">
-            <div id="cats" class="flex flex-wrap gap-2"></div>
-            <div class="mt-3 flex justify-center">
-                <button id="cat-toggle" class="hidden items-center gap-1.5 text-xs font-medium text-[#9C988D] transition hover:text-[#C96442] dark:hover:text-[#D97757]">
-                    <span data-label>Show all</span><i class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
-                </button>
+        <div id="view-explore">
+            <div id="filterbar" class="mt-8 hidden">
+                <div id="cats" class="flex flex-wrap gap-2"></div>
+                <div class="mt-3 flex justify-center">
+                    <button id="cat-toggle" class="hidden items-center gap-1.5 text-xs font-medium text-[#9C988D] transition hover:text-[#C96442] dark:hover:text-[#D97757]">
+                        <span data-label>Show all</span><i class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+                    </button>
+                </div>
             </div>
+
+            <div id="status" class="mt-16"></div>
+            <div id="grid" class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
         </div>
 
-        <div id="status" class="mt-16"></div>
-        <div id="grid" class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+        <div id="view-installed" class="mt-8 hidden"></div>
     </main>
 
     <div id="settings" class="fixed inset-0 z-[200] hidden">
@@ -138,7 +151,17 @@
         const catToggle = document.getElementById('cat-toggle');
         const catToggleLabel = catToggle.querySelector('[data-label]');
         const catToggleIcon = catToggle.querySelector('i');
-        const state = { category: 'all', query: '', data: null, loading: true, error: null, catExpanded: false };
+        const viewExplore = document.getElementById('view-explore');
+        const viewInstalled = document.getElementById('view-installed');
+        const exploreActions = document.getElementById('explore-actions');
+        const tabs = Array.from(document.querySelectorAll('[data-tab]'));
+        const installedCountEl = document.querySelector('[data-installed-count]');
+        let rendered = [];
+        let installed = [];
+        const state = { tab: 'explore', category: 'all', query: '', data: null, loading: true, error: null, catExpanded: false };
+
+        const TAB_ACTIVE = 'bg-black/[0.07] text-[#1F1E1D] dark:bg-white/10 dark:text-[#F2EFE7]';
+        const TAB_IDLE = 'text-[#6F6C63] hover:text-[#1F1E1D] dark:text-[#A6A296] dark:hover:text-[#F2EFE7]';
 
         const PILL_ACTIVE = 'bg-[#C96442] text-white border-[#C96442] dark:bg-[#D97757] dark:border-[#D97757]';
         const PILL_IDLE = 'bg-white text-[#6F6C63] border-[#E7E4DA] hover:border-[#C96442]/40 hover:text-[#C96442] dark:bg-[#252320] dark:text-[#A6A296] dark:border-white/10 dark:hover:border-[#D97757]/40 dark:hover:text-[#D97757]';
@@ -240,7 +263,13 @@
                         '<span class="inline-flex min-w-0 items-center gap-1.5 text-xs text-[#9C988D]" title="' + esc(s.source.full) + '"><i class="fa-brands fa-github shrink-0"></i><span class="truncate">' + esc(s.source.full) + '</span></span>' +
                         '<div class="flex shrink-0 items-center gap-2">' +
                             '<button data-github data-url="' + esc(s.htmlUrl) + '" aria-label="View on GitHub" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-brands fa-github text-sm"></i></button>' +
-                            '<button data-install class="rounded-full bg-[#C96442] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b4583a] active:scale-95 dark:bg-[#D97757] dark:hover:bg-[#c96846]">Install</button>' +
+                            '<div class="relative" data-install-root data-idx="' + i + '">' +
+                            '<button data-install-toggle class="inline-flex items-center gap-1 rounded-full bg-[#C96442] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b4583a] active:scale-95 dark:bg-[#D97757] dark:hover:bg-[#c96846]">Install<i class="fa-solid fa-chevron-down text-[9px]"></i></button>' +
+                            '<div data-install-menu class="absolute bottom-full right-0 z-20 mb-2 hidden w-44 overflow-hidden rounded-xl border border-[#E7E4DA] bg-white shadow-xl dark:border-white/10 dark:bg-[#2A2724]">' +
+                                '<button data-install-code class="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:hover:bg-white/5"><i class="fa-solid fa-terminal w-4 text-[#9C988D]"></i>Claude Code</button>' +
+                                '<button data-install-claude class="flex w-full items-center gap-2 border-t border-[#E7E4DA] px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:border-white/10 dark:hover:bg-white/5"><i class="fa-regular fa-comment-dots w-4 text-[#9C988D]"></i>Claude</button>' +
+                            '</div>' +
+                        '</div>' +
                         '</div>' +
                     '</div>' +
                 '</article>';
@@ -257,21 +286,140 @@
                 return;
             }
             statusEl.innerHTML = '';
+            rendered = items;
             grid.innerHTML = items.map(cardHTML).join('');
             grid.querySelectorAll('[data-github]').forEach(function (b) {
                 b.addEventListener('click', function () { if (api) api.openExternal(b.getAttribute('data-url')); });
             });
-            grid.querySelectorAll('[data-install]').forEach(function (b) {
-                b.addEventListener('click', function () {
-                    if (b.dataset.on === '1') {
-                        b.dataset.on = '0'; b.textContent = 'Install';
-                        b.className = 'rounded-full bg-[#C96442] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b4583a] active:scale-95 dark:bg-[#D97757] dark:hover:bg-[#c96846]';
-                    } else {
-                        b.dataset.on = '1'; b.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Installed';
-                        b.className = 'rounded-full border border-[#C96442]/40 px-4 py-1.5 text-xs font-semibold text-[#C96442] transition active:scale-95 dark:border-[#D97757]/40 dark:text-[#D97757]';
-                    }
+            grid.querySelectorAll('[data-install-toggle]').forEach(function (b) {
+                b.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const menu = b.parentNode.querySelector('[data-install-menu]');
+                    document.querySelectorAll('[data-install-menu]').forEach(function (m) { if (m !== menu) m.classList.add('hidden'); });
+                    menu.classList.toggle('hidden');
                 });
             });
+            function doInstall(root, kind, labelBtn) {
+                const skill = rendered[+root.getAttribute('data-idx')];
+                const menu = root.querySelector('[data-install-menu]');
+                const toggle = root.querySelector('[data-install-toggle]');
+                menu.classList.add('hidden');
+                if (!api || !skill) return;
+                const orig = toggle.innerHTML;
+                toggle.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                const call = kind === 'code' ? api.installCode(skill) : api.installClaude(skill);
+                call.then(function () {
+                    toggle.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Installed';
+                    toggle.classList.add('opacity-80');
+                    loadInstalled();
+                    window.setTimeout(function () { toggle.innerHTML = orig; toggle.classList.remove('opacity-80'); }, 2200);
+                }).catch(function (err) {
+                    toggle.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i>Failed';
+                    window.setTimeout(function () { toggle.innerHTML = orig; }, 2600);
+                });
+            }
+            grid.querySelectorAll('[data-install-code]').forEach(function (b) {
+                b.addEventListener('click', function (e) { e.stopPropagation(); doInstall(b.closest('[data-install-root]'), 'code'); });
+            });
+            grid.querySelectorAll('[data-install-claude]').forEach(function (b) {
+                b.addEventListener('click', function (e) { e.stopPropagation(); doInstall(b.closest('[data-install-root]'), 'claude'); });
+            });
+        }
+
+        function relativeTime(ts) {
+            if (!ts) return '';
+            const s = Math.floor((Date.now() - ts) / 1000);
+            if (s < 60) return 'just now';
+            const m = Math.floor(s / 60); if (m < 60) return m + (m === 1 ? ' minute ago' : ' minutes ago');
+            const h = Math.floor(m / 60); if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+            const d = Math.floor(h / 24); if (d < 30) return d + (d === 1 ? ' day ago' : ' days ago');
+            return new Date(ts).toLocaleDateString();
+        }
+
+        function targetMeta(target) {
+            if (target === 'code') return { icon: 'fa-solid fa-terminal', label: 'Claude Code' };
+            return { icon: 'fa-regular fa-comment-dots', label: 'Claude' };
+        }
+
+        function installedCardHTML(r, i) {
+            const meta = targetMeta(r.target);
+            const loc = r.target === 'code' ? r.path : r.path;
+            const locLabel = r.target === 'code' ? '~/.claude/skills' : 'Downloaded · upload in Claude settings';
+            return '' +
+                '<article class="group flex animate-rise flex-col rounded-2xl border border-[#E7E4DA] bg-white p-5 transition duration-300 hover:border-[#C96442]/40 dark:border-white/10 dark:bg-[#252320] dark:hover:border-[#D97757]/40" style="animation-delay:' + Math.min(i * 35, 400) + 'ms">' +
+                    '<div class="flex items-start justify-between gap-3">' +
+                        '<h3 class="min-w-0 truncate font-serif text-lg leading-tight" title="' + esc(r.title) + '">' + esc(r.title) + '</h3>' +
+                        '<span class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E4DA] px-2.5 py-1 text-[11px] font-medium text-[#6F6C63] dark:border-white/10 dark:text-[#A6A296]"><i class="' + meta.icon + ' text-[10px]"></i>' + esc(meta.label) + '</span>' +
+                    '</div>' +
+                    '<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#C96442] dark:text-[#D97757]">' + esc(r.categoryLabel) + '</p>' +
+                    '<p class="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-[#6F6C63] dark:text-[#A6A296]">' + esc(r.description || 'No description provided.') + '</p>' +
+                    '<div class="mt-4 space-y-1.5 text-xs text-[#9C988D]">' +
+                        '<p class="flex items-center gap-2" title="' + esc(loc) + '"><i class="fa-regular fa-folder w-3.5"></i><span class="truncate">' + esc(locLabel) + '</span></p>' +
+                        '<p class="flex items-center gap-2"><i class="fa-regular fa-clock w-3.5"></i>Installed ' + esc(relativeTime(r.installedAt)) + (r.fileCount ? ' · ' + r.fileCount + (r.fileCount === 1 ? ' file' : ' files') : '') + '</p>' +
+                        (r.missing ? '<p class="flex items-center gap-2 text-amber-600 dark:text-amber-500"><i class="fa-solid fa-triangle-exclamation w-3.5"></i>Files no longer on disk</p>' : '') +
+                    '</div>' +
+                    '<div class="mt-5 flex items-center justify-end gap-2">' +
+                        (r.htmlUrl ? '<button data-inst-github data-url="' + esc(r.htmlUrl) + '" aria-label="View on GitHub" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-brands fa-github text-sm"></i></button>' : '') +
+                        (r.missing ? '' : '<button data-inst-reveal data-path="' + esc(r.path) + '" aria-label="Show in folder" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-regular fa-folder-open text-sm"></i></button>') +
+                        '<button data-inst-remove data-key="' + esc(r.key) + '" class="inline-flex items-center gap-1.5 rounded-full border border-[#E7E4DA] px-4 py-1.5 text-xs font-semibold text-[#6F6C63] transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-600 active:scale-95 dark:border-white/10 dark:text-[#A6A296]"><i class="fa-solid fa-trash-can text-[11px]"></i>' + (r.target === 'code' ? 'Uninstall' : 'Remove') + '</button>' +
+                    '</div>' +
+                '</article>';
+        }
+
+        function renderInstalled() {
+            if (!api) { viewInstalled.innerHTML = notice('fa-plug', 'Unavailable', 'Launch via the Skiller app.', null, null); return; }
+            if (!installed.length) {
+                viewInstalled.innerHTML = notice('fa-box-open', 'No installed skills yet', 'Skills you install will appear here so you can manage them.', null, null);
+                return;
+            }
+            viewInstalled.innerHTML =
+                '<p class="text-sm text-[#9C988D]">' + installed.length + (installed.length === 1 ? ' installed skill' : ' installed skills') + '</p>' +
+                '<div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">' + installed.map(installedCardHTML).join('') + '</div>';
+            viewInstalled.querySelectorAll('[data-inst-github]').forEach(function (b) {
+                b.addEventListener('click', function () { api.openExternal(b.getAttribute('data-url')); });
+            });
+            viewInstalled.querySelectorAll('[data-inst-reveal]').forEach(function (b) {
+                b.addEventListener('click', function () { api.revealPath(b.getAttribute('data-path')); });
+            });
+            viewInstalled.querySelectorAll('[data-inst-remove]').forEach(function (b) {
+                b.addEventListener('click', async function () {
+                    b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                    await api.uninstall(b.getAttribute('data-key'));
+                    await loadInstalled();
+                });
+            });
+        }
+
+        function updateInstalledCount() {
+            if (!installedCountEl) return;
+            if (installed.length) { installedCountEl.textContent = String(installed.length); installedCountEl.classList.remove('hidden'); }
+            else installedCountEl.classList.add('hidden');
+        }
+
+        async function loadInstalled() {
+            if (!api) { installed = []; updateInstalledCount(); if (state.tab === 'installed') renderInstalled(); return; }
+            try { installed = await api.listInstalled() || []; } catch (e) { installed = []; }
+            updateInstalledCount();
+            if (state.tab === 'installed') renderInstalled();
+        }
+
+        function syncTabs() {
+            tabs.forEach(function (t) {
+                const active = t.getAttribute('data-tab') === state.tab;
+                const base = t.getAttribute('data-tab') === 'installed' ? 'inline-flex items-center gap-1.5 ' : '';
+                t.className = base + 'rounded-full px-3.5 py-1.5 text-sm font-medium transition ' + (active ? TAB_ACTIVE : TAB_IDLE);
+            });
+        }
+
+        function switchTab(tab) {
+            state.tab = tab;
+            syncTabs();
+            const onExplore = tab === 'explore';
+            viewExplore.classList.toggle('hidden', !onExplore);
+            viewInstalled.classList.toggle('hidden', onExplore);
+            exploreActions.classList.toggle('hidden', !onExplore);
+            if (onExplore) render();
+            else { loadInstalled(); renderInstalled(); }
         }
 
         function render() {
@@ -302,8 +450,10 @@
             updateActivePills();
             renderGrid();
         });
+        tabs.forEach(function (t) { t.addEventListener('click', function () { switchTab(t.getAttribute('data-tab')); }); });
         catToggle.addEventListener('click', function () { state.catExpanded = !state.catExpanded; layoutCategories(); });
         search.addEventListener('input', function () { state.query = search.value; renderGrid(); });
+        document.addEventListener('click', function () { document.querySelectorAll('[data-install-menu]').forEach(function (m) { m.classList.add('hidden'); }); }); /* data-install-menu-closer */
         document.getElementById('btn-refresh').addEventListener('click', function () { load(true); });
 
         var resizeTimer = null;
@@ -313,6 +463,8 @@
         });
 
         setupSettings(load);
+        syncTabs();
+        loadInstalled();
         load(false);
     })();
 
