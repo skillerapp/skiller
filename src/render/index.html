@@ -27,8 +27,38 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
     <style>
         body { font-optical-sizing: auto; }
+        .md-body { line-height: 1.7; color: #44413B; }
+        @media (prefers-color-scheme: dark) { .md-body { color: #C9C4B8; } }
+        .md-body > :first-child { margin-top: 0; }
+        .md-body h1, .md-body h2, .md-body h3, .md-body h4 { font-family: 'Fraunces', Georgia, serif; color: #1F1E1D; line-height: 1.2; margin: 1.8em 0 0.6em; letter-spacing: -0.01em; }
+        @media (prefers-color-scheme: dark) { .md-body h1, .md-body h2, .md-body h3, .md-body h4 { color: #F2EFE7; } }
+        .md-body h1 { font-size: 2rem; } .md-body h2 { font-size: 1.5rem; } .md-body h3 { font-size: 1.2rem; } .md-body h4 { font-size: 1.05rem; }
+        .md-body h2 { padding-bottom: 0.3em; border-bottom: 1px solid #E7E4DA; }
+        @media (prefers-color-scheme: dark) { .md-body h2 { border-color: rgba(255,255,255,0.08); } }
+        .md-body p, .md-body ul, .md-body ol, .md-body blockquote, .md-body table, .md-body pre { margin: 0.9em 0; }
+        .md-body ul, .md-body ol { padding-left: 1.4em; } .md-body li { margin: 0.35em 0; }
+        .md-body ul { list-style: disc; } .md-body ol { list-style: decimal; }
+        .md-body a { color: #C96442; text-decoration: underline; text-underline-offset: 2px; }
+        @media (prefers-color-scheme: dark) { .md-body a { color: #D97757; } }
+        .md-body code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em; background: rgba(31,30,29,0.06); padding: 0.15em 0.4em; border-radius: 6px; }
+        @media (prefers-color-scheme: dark) { .md-body code { background: rgba(255,255,255,0.08); } }
+        .md-body pre { background: #1F1E1D; color: #F2EFE7; padding: 1.1em 1.3em; border-radius: 14px; overflow-x: auto; font-size: 0.85em; line-height: 1.6; }
+        @media (prefers-color-scheme: dark) { .md-body pre { background: #0F0E0D; border: 1px solid rgba(255,255,255,0.06); } }
+        .md-body pre code { background: none; padding: 0; font-size: 1em; color: inherit; }
+        .md-body blockquote { border-left: 3px solid #C96442; padding-left: 1.1em; color: #6F6C63; font-style: italic; }
+        @media (prefers-color-scheme: dark) { .md-body blockquote { border-color: #D97757; color: #A6A296; } }
+        .md-body table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+        .md-body th, .md-body td { border: 1px solid #E7E4DA; padding: 0.5em 0.8em; text-align: left; }
+        @media (prefers-color-scheme: dark) { .md-body th, .md-body td { border-color: rgba(255,255,255,0.1); } }
+        .md-body th { background: rgba(31,30,29,0.04); font-weight: 600; }
+        @media (prefers-color-scheme: dark) { .md-body th { background: rgba(255,255,255,0.05); } }
+        .md-body img { max-width: 100%; border-radius: 12px; margin: 1em 0; }
+        .md-body hr { border: none; border-top: 1px solid #E7E4DA; margin: 2em 0; }
+        @media (prefers-color-scheme: dark) { .md-body hr { border-color: rgba(255,255,255,0.1); } }
         .cet-container { overflow-y: scroll !important; }
         .cet-titlebar { z-index: 70; background: transparent !important; }
         @media (prefers-color-scheme: dark) { .cet-icon { filter: invert(1) brightness(1.7); } }
@@ -74,6 +104,7 @@
                     </div>
                     <button id="btn-refresh" title="Refresh" class="grid h-9 w-9 shrink-0 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-solid fa-rotate text-sm"></i></button>
                 </div>
+                <button id="btn-account" title="Claude account" class="grid h-9 w-9 shrink-0 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-regular fa-user text-sm"></i></button>
                 <button id="btn-settings" title="Skill repositories" class="grid h-9 w-9 shrink-0 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-solid fa-sliders text-sm"></i></button>
             </div>
         </div>
@@ -127,6 +158,40 @@
         </div>
     </div>
 
+    <div id="account" class="fixed inset-0 z-[250] hidden grid place-content-center justify-items-center p-6">
+        <div data-account-backdrop class="fixed inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative w-[26rem] max-w-full animate-rise overflow-hidden rounded-2xl border border-[#E7E4DA] bg-[#F5F4EE] shadow-2xl dark:border-white/10 dark:bg-[#201E1C]">
+            <div class="flex items-center justify-between border-b border-[#E7E4DA] px-6 py-4 dark:border-white/10">
+                <h2 class="font-serif text-2xl">Claude account</h2>
+                <button id="account-close" class="grid h-8 w-8 place-content-center rounded-full text-[#6F6C63] transition hover:bg-black/5 dark:text-[#A6A296] dark:hover:bg-white/5"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="account-body" class="px-6 py-6"></div>
+        </div>
+    </div>
+
+    <div id="detail" class="fixed inset-0 z-[300] hidden bg-[#F5F4EE] dark:bg-[#1A1917]">
+        <div class="flex h-full flex-col">
+            <header class="flex items-start justify-between gap-4 border-b border-[#E7E4DA] px-7 pb-4 pt-12 dark:border-white/10">
+                <div class="min-w-0">
+                    <button id="detail-back" class="mb-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#9C988D] transition hover:text-[#C96442] dark:hover:text-[#D97757]"><i class="fa-solid fa-arrow-left text-[10px]"></i>Back</button>
+                    <h2 id="detail-title" class="truncate font-serif text-3xl tracking-tight"></h2>
+                    <p id="detail-sub" class="mt-1 truncate text-sm text-[#9C988D]"></p>
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                    <button id="detail-github" class="hidden grid h-9 w-9 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-brands fa-github text-sm"></i></button>
+                    <button id="detail-close" class="grid h-9 w-9 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-solid fa-xmark text-sm"></i></button>
+                </div>
+            </header>
+            <div class="flex min-h-0 flex-1">
+                <aside class="hidden w-72 shrink-0 overflow-y-auto border-r border-[#E7E4DA] px-3 py-4 dark:border-white/10 sm:block">
+                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9C988D]">Files</p>
+                    <div id="detail-files" class="space-y-0.5"></div>
+                </aside>
+                <main id="detail-content" class="min-w-0 flex-1 overflow-y-auto"></main>
+            </div>
+        </div>
+    </div>
+
     <div id="offline-banner" class="hidden fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/10 bg-[#1F1E1D] px-5 py-3 text-sm tracking-wide text-white shadow-2xl dark:bg-[#2A2724]">
         No internet connection — the app will not work
     </div>
@@ -137,10 +202,19 @@
 
 <script>
     window.addEventListener('DOMContentLoaded', function () {
-        ['loader', 'settings', 'confirm', 'offline-banner', 'scroll-top'].forEach(function (id) {
+        ['loader', 'settings', 'confirm', 'account', 'detail', 'offline-banner', 'scroll-top'].forEach(function (id) {
             const el = document.getElementById(id);
             if (el && el.parentNode !== document.body) document.body.appendChild(el);
         });
+    });
+    document.addEventListener('click', function (e) {
+        const a = e.target.closest && e.target.closest('a[href]');
+        if (!a) return;
+        const href = a.getAttribute('href') || '';
+        if (/^https?:\/\//i.test(href)) {
+            e.preventDefault();
+            if (window.skiller) window.skiller.openExternal(href);
+        }
     });
 </script>
 
@@ -219,6 +293,35 @@
         confirmCancel.addEventListener('click', function () { closeConfirm(false); });
         confirmBackdrop.addEventListener('click', function () { closeConfirm(false); });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !confirmEl.classList.contains('hidden')) closeConfirm(false); });
+
+        let activeClaudeToggle = null;
+        let activeClaudeOrig = null;
+        let claudeAccountSkills = [];
+        let claudeSync = 'idle';
+
+        function updateClaudeButton(s) {
+            const t = activeClaudeToggle;
+            if (!t) return;
+            if (s.phase === 'done') {
+                t.className = INSTALLED_CLS; t.innerHTML = TOGGLE_INSTALLED_HTML;
+                const root = t.closest('[data-install-root]');
+                const item = root && root.querySelector('[data-install-claude]');
+                if (item) { item.disabled = true; item.className = MENU_BORDER + MENU_ITEM_DONE; if (!item.querySelector('[data-check]')) item.insertAdjacentHTML('beforeend', MENU_CHECK); }
+                activeClaudeToggle = null; activeClaudeOrig = null;
+                syncClaudeSkills(true);
+            } else if (s.phase === 'error') {
+                t.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i>Failed';
+                const o = activeClaudeOrig; activeClaudeToggle = null; activeClaudeOrig = null;
+                if (o) window.setTimeout(function () { t.className = o.cls; t.innerHTML = o.html; }, 2800);
+            } else if (s.phase === 'login') {
+                t.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1.5"></i>Sign in…';
+            } else if (s.phase === 'manual') {
+                t.innerHTML = '<i class="fa-solid fa-up-right-from-square mr-1.5"></i>Finish in Claude';
+            } else {
+                t.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Installing…';
+            }
+        }
+        if (api && api.onClaudeStatus) api.onClaudeStatus(updateClaudeButton);
 
         const TAB_ACTIVE = 'bg-black/[0.07] text-[#1F1E1D] dark:bg-white/10 dark:text-[#F2EFE7]';
         const TAB_IDLE = 'text-[#6F6C63] hover:text-[#1F1E1D] dark:text-[#A6A296] dark:hover:text-[#F2EFE7]';
@@ -325,14 +428,18 @@
         const TOGGLE_INSTALL_HTML = 'Install<i class="fa-solid fa-chevron-down text-[9px]"></i>';
         const TOGGLE_INSTALLED_HTML = '<i class="fa-solid fa-check text-[11px]"></i>Installed<i class="fa-solid fa-chevron-down text-[9px]"></i>';
         const MENU_CHECK = '<i data-check class="fa-solid fa-check ml-auto text-[11px] text-[#C96442] dark:text-[#D97757]"></i>';
+        const MENU_ITEM = 'flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:hover:bg-white/5';
+        const MENU_ITEM_DONE = 'flex w-full cursor-not-allowed items-center gap-2 px-3 py-2.5 text-left text-xs font-medium text-[#9C988D] dark:text-[#6F6C63]';
+        const MENU_BORDER = 'border-t border-[#E7E4DA] dark:border-white/10 ';
 
         function installStatus(s) {
             const nm = (s && s.name || '').toLowerCase().trim();
             let code = false, claude = false;
             installed.forEach(function (r) {
-                if ((r.name || '').toLowerCase().trim() !== nm) return;
-                if (r.target === 'code') code = true;
-                else if (r.target === 'claude') claude = true;
+                if ((r.name || '').toLowerCase().trim() === nm && r.target === 'code') code = true;
+            });
+            claudeAccountSkills.forEach(function (a) {
+                if (((a && a.name) || '').toLowerCase().trim() === nm) claude = true;
             });
             return { code: code, claude: claude, any: code || claude };
         }
@@ -341,7 +448,7 @@
             const st = installStatus(s);
             return '' +
                 '<article class="group flex animate-rise flex-col rounded-2xl border border-[#E7E4DA] bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-[#C96442]/40 hover:shadow-[0_12px_40px_-12px_rgba(31,30,29,0.18)] dark:border-white/10 dark:bg-[#252320] dark:hover:border-[#D97757]/40" style="animation-delay:' + Math.min(i * 35, 400) + 'ms">' +
-                    '<h3 class="truncate font-serif text-lg leading-tight" title="' + esc(s.title) + '">' + esc(s.title) + '</h3>' +
+                    '<h3 data-detail-idx="' + i + '" class="cursor-pointer truncate font-serif text-lg leading-tight transition hover:text-[#C96442] dark:hover:text-[#D97757]" title="View ' + esc(s.title) + '">' + esc(s.title) + '</h3>' +
                     '<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#C96442] dark:text-[#D97757]">' + esc(s.categoryLabel) + '</p>' +
                     '<p class="mt-4 line-clamp-3 flex-1 text-sm leading-relaxed text-[#6F6C63] dark:text-[#A6A296]">' + esc(s.description || 'No description provided.') + '</p>' +
                     '<div class="mt-5 flex items-center justify-between gap-2">' +
@@ -351,8 +458,8 @@
                             '<div class="relative" data-install-root data-idx="' + i + '">' +
                             '<button data-install-toggle class="' + (st.any ? INSTALLED_CLS : INSTALL_CLS) + '">' + (st.any ? TOGGLE_INSTALLED_HTML : TOGGLE_INSTALL_HTML) + '</button>' +
                             '<div data-install-menu class="absolute bottom-full right-0 z-20 mb-2 hidden w-44 overflow-hidden rounded-xl border border-[#E7E4DA] bg-white shadow-xl dark:border-white/10 dark:bg-[#2A2724]">' +
-                                '<button data-install-code class="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:hover:bg-white/5">' + svgCode('h-4 w-4 shrink-0 text-[#6F6C63] dark:text-[#A6A296]') + 'Claude Code' + (st.code ? MENU_CHECK : '') + '</button>' +
-                                '<button data-install-claude class="flex w-full items-center gap-2 border-t border-[#E7E4DA] px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:border-white/10 dark:hover:bg-white/5">' + svgClaude('h-4 w-4 shrink-0 text-[#6F6C63] dark:text-[#A6A296]') + 'Claude' + (st.claude ? MENU_CHECK : '') + '</button>' +
+                                '<button data-install-code ' + (st.code ? 'disabled ' : '') + 'class="' + (st.code ? MENU_ITEM_DONE : MENU_ITEM) + '">' + svgCode('h-4 w-4 shrink-0 text-[#6F6C63] dark:text-[#A6A296]') + 'Claude Code' + (st.code ? MENU_CHECK : '') + '</button>' +
+                                '<button data-install-claude ' + (st.claude ? 'disabled ' : '') + 'class="' + MENU_BORDER + (st.claude ? MENU_ITEM_DONE : MENU_ITEM) + '">' + svgClaude('h-4 w-4 shrink-0 text-[#6F6C63] dark:text-[#A6A296]') + 'Claude' + (st.claude ? MENU_CHECK : '') + '</button>' +
                             '</div>' +
                         '</div>' +
                         '</div>' +
@@ -373,6 +480,9 @@
             statusEl.innerHTML = '';
             rendered = items;
             grid.innerHTML = items.map(cardHTML).join('');
+            grid.querySelectorAll('[data-detail-idx]').forEach(function (b) {
+                b.addEventListener('click', function () { const s = rendered[+b.getAttribute('data-detail-idx')]; if (s && window.openSkillDetail) window.openSkillDetail(s); });
+            });
             grid.querySelectorAll('[data-github]').forEach(function (b) {
                 b.addEventListener('click', function () { if (api) api.openExternal(b.getAttribute('data-url')); });
             });
@@ -393,23 +503,28 @@
                 const origHtml = toggle.innerHTML;
                 const origClass = toggle.className;
                 toggle.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Installing…';
-                const call = kind === 'code' ? api.installCode(skill) : api.installClaude(skill);
-                call.then(function () {
+                if (kind === 'claude') {
+                    activeClaudeToggle = toggle;
+                    activeClaudeOrig = { html: origHtml, cls: origClass };
+                    api.installClaude(skill).catch(function () { updateClaudeButton({ phase: 'error' }); });
+                    return;
+                }
+                api.installCode(skill).then(function () {
                     loadInstalled();
                     toggle.className = INSTALLED_CLS;
                     toggle.innerHTML = TOGGLE_INSTALLED_HTML;
-                    const item = root.querySelector(kind === 'code' ? '[data-install-code]' : '[data-install-claude]');
-                    if (item && !item.querySelector('[data-check]')) item.insertAdjacentHTML('beforeend', MENU_CHECK);
+                    const item = root.querySelector('[data-install-code]');
+                    if (item) { item.disabled = true; item.className = MENU_ITEM_DONE; if (!item.querySelector('[data-check]')) item.insertAdjacentHTML('beforeend', MENU_CHECK); }
                 }).catch(function (err) {
                     toggle.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i>Failed';
                     window.setTimeout(function () { toggle.className = origClass; toggle.innerHTML = origHtml; }, 2600);
                 });
             }
             grid.querySelectorAll('[data-install-code]').forEach(function (b) {
-                b.addEventListener('click', function (e) { e.stopPropagation(); doInstall(b.closest('[data-install-root]'), 'code'); });
+                b.addEventListener('click', function (e) { e.stopPropagation(); if (b.disabled) return; doInstall(b.closest('[data-install-root]'), 'code'); });
             });
             grid.querySelectorAll('[data-install-claude]').forEach(function (b) {
-                b.addEventListener('click', function (e) { e.stopPropagation(); doInstall(b.closest('[data-install-root]'), 'claude'); });
+                b.addEventListener('click', function (e) { e.stopPropagation(); if (b.disabled) return; doInstall(b.closest('[data-install-root]'), 'claude'); });
             });
         }
 
@@ -432,44 +547,73 @@
         function installedCardHTML(r, i) {
             const loc = r.path;
             const locLabel = r.target === 'code' ? '~/.claude/skills' : 'Downloaded · upload in Claude settings';
+            const clickable = r.target === 'code' && r.path;
             return '' +
                 '<article class="group flex animate-rise flex-col rounded-2xl border border-[#E7E4DA] bg-white p-5 transition duration-300 hover:border-[#C96442]/40 dark:border-white/10 dark:bg-[#252320] dark:hover:border-[#D97757]/40" style="animation-delay:' + Math.min(i * 35, 400) + 'ms">' +
-                    '<h3 class="truncate font-serif text-lg leading-tight" title="' + esc(r.title) + '">' + esc(r.title) + '</h3>' +
-                    '<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#C96442] dark:text-[#D97757]">' + esc(r.categoryLabel) + '</p>' +
-                    '<p class="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-[#6F6C63] dark:text-[#A6A296]">' + esc(r.description || 'No description provided.') + '</p>' +
+                    '<h3 ' + (clickable ? 'data-detail-path="' + esc(r.path) + '" data-detail-name="' + esc(r.title) + '" ' : '') + 'class="truncate font-serif text-lg leading-tight' + (clickable ? ' cursor-pointer transition hover:text-[#C96442] dark:hover:text-[#D97757]' : '') + '" title="' + esc(r.title) + '">' + esc(r.title) + '</h3>' +
+                    (r.account ? '' : '<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#C96442] dark:text-[#D97757]">' + esc(r.categoryLabel) + '</p>') +
+                    '<p class="' + (r.account ? 'mt-2' : 'mt-3') + ' line-clamp-2 flex-1 text-sm leading-relaxed text-[#6F6C63] dark:text-[#A6A296]">' + esc(r.description || 'No description provided.') + '</p>' +
                     '<div class="mt-4 space-y-1.5 text-xs text-[#9C988D]">' +
-                        (r.target === 'code' ? '' : '<p class="flex items-center gap-2" title="' + esc(loc) + '"><i class="fa-regular fa-folder w-3.5"></i><span class="truncate">' + esc(locLabel) + '</span></p>') +
-                        '<p class="flex items-center gap-2"><i class="fa-regular fa-clock w-3.5"></i>' + (r.external ? 'Added ' : 'Installed ') + esc(relativeTime(r.installedAt)) + (r.fileCount ? ' · ' + r.fileCount + (r.fileCount === 1 ? ' file' : ' files') : '') + '</p>' +
-                        (r.missing ? '<p class="flex items-center gap-2 text-amber-600 dark:text-amber-500"><i class="fa-solid fa-triangle-exclamation w-3.5"></i>Files no longer on disk</p>' : '') +
+                        (r.account
+                            ? '<p class="flex items-center gap-2"><i class="fa-solid fa-cloud w-3.5"></i>On your Claude account</p>'
+                            : ((r.target === 'code' ? '' : '<p class="flex items-center gap-2" title="' + esc(loc) + '"><i class="fa-regular fa-folder w-3.5"></i><span class="truncate">' + esc(locLabel) + '</span></p>') +
+                               '<p class="flex items-center gap-2"><i class="fa-regular fa-clock w-3.5"></i>' + (r.external ? 'Added ' : 'Installed ') + esc(relativeTime(r.installedAt)) + (r.fileCount ? ' · ' + r.fileCount + (r.fileCount === 1 ? ' file' : ' files') : '') + '</p>' +
+                               (r.missing ? '<p class="flex items-center gap-2 text-amber-600 dark:text-amber-500"><i class="fa-solid fa-triangle-exclamation w-3.5"></i>Files no longer on disk</p>' : ''))) +
                     '</div>' +
+                    (r.account ? '' :
                     '<div class="mt-5 flex items-center justify-end gap-2">' +
                         (r.htmlUrl ? '<button data-inst-github data-url="' + esc(r.htmlUrl) + '" aria-label="View on GitHub" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-brands fa-github text-sm"></i></button>' : '') +
                         (r.missing ? '' : '<button data-inst-reveal data-path="' + esc(r.path) + '" aria-label="Show in folder" class="grid h-8 w-8 place-content-center rounded-full border border-[#E7E4DA] text-[#6F6C63] transition hover:border-[#C96442]/40 hover:text-[#C96442] active:scale-95 dark:border-white/10 dark:text-[#A6A296] dark:hover:text-[#D97757]"><i class="fa-regular fa-folder-open text-sm"></i></button>') +
                         '<button data-inst-remove data-key="' + esc(r.key) + '" data-name="' + esc(r.title) + '" data-target="' + esc(r.target) + '" class="inline-flex items-center gap-1.5 rounded-full border border-[#E7E4DA] px-4 py-1.5 text-xs font-semibold text-[#6F6C63] transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-600 active:scale-95 dark:border-white/10 dark:text-[#A6A296]"><i class="fa-solid fa-trash-can text-[11px]"></i>' + (r.target === 'code' ? 'Uninstall' : 'Remove') + '</button>' +
-                    '</div>' +
+                    '</div>') +
                 '</article>';
+        }
+
+        function claudeSyncTrailer() {
+            let status = '';
+            if (claudeSync === 'loading') status = '<span class="flex items-center gap-2"><i class="fa-solid fa-spinner fa-spin"></i>Syncing…</span>';
+            else if (claudeSync === 'needlogin') status = '<span>Sign in to sync. <button id="claude-signin" class="font-semibold text-[#C96442] hover:underline dark:text-[#D97757]">Sign in</button></span>';
+            else status = '<button id="claude-resync" class="hover:text-[#1F1E1D] dark:hover:text-[#F2EFE7]"><i class="fa-solid fa-rotate mr-1.5"></i>Refresh</button>';
+            return '<div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#9C988D]">' +
+                '<span>Claude skills are managed on the Claude website.</span>' +
+                '<button id="claude-open-web" class="inline-flex items-center gap-1.5 font-semibold text-[#C96442] hover:underline dark:text-[#D97757]"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>Open Claude website</button>' +
+                status +
+                '</div>';
         }
 
         function renderInstalled() {
             if (!api) { viewInstalled.innerHTML = notice('fa-plug', 'Unavailable', 'Launch via the Skiller app.', null, null); return; }
-            if (!installed.length) {
-                viewInstalled.innerHTML = notice('fa-box-open', 'No installed skills yet', 'Skills you install will appear here so you can manage them.', null, null);
+            const codeSkills = installed.filter(function (r) { return r.target === 'code'; });
+            const claudeSkills = claudeAccountSkills.map(function (s) {
+                return { title: s.name, name: s.name, description: s.description || '', target: 'claude', account: true };
+            });
+
+            if (!codeSkills.length && !claudeSkills.length && claudeSync !== 'loading') {
+                viewInstalled.innerHTML = notice('fa-box-open', 'No installed skills yet', 'Skills you install will appear here so you can manage them.', null, null) +
+                    '<div class="mt-6 text-center">' + claudeSyncTrailer() + '</div>';
+                bindSyncButtons();
                 return;
             }
-            const codeSkills = installed.filter(function (r) { return r.target === 'code'; });
-            const claudeSkills = installed.filter(function (r) { return r.target === 'claude'; });
-            function section(title, sub, list) {
-                if (!list.length) return '';
+            function section(title, sub, list, trailer) {
+                if (!list.length && !trailer) return '';
                 return '<section class="mt-10 first:mt-0">' +
                     '<div class="flex items-center gap-2.5">' +
                         '<h2 class="font-serif text-2xl">' + esc(title) + '</h2>' +
-                        '<span class="min-w-[1.25rem] rounded-full bg-[#E7E4DA] px-1.5 text-center text-[11px] font-semibold text-[#6F6C63] dark:bg-white/15 dark:text-[#F2EFE7]">' + list.length + '</span>' +
+                        (list.length ? '<span class="min-w-[1.25rem] rounded-full bg-[#E7E4DA] px-1.5 text-center text-[11px] font-semibold text-[#6F6C63] dark:bg-white/15 dark:text-[#F2EFE7]">' + list.length + '</span>' : '') +
                     '</div>' +
                     '<p class="mt-1 text-sm text-[#9C988D]">' + esc(sub) + '</p>' +
-                    '<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">' + list.map(installedCardHTML).join('') + '</div>' +
+                    (list.length ? '<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">' + list.map(installedCardHTML).join('') + '</div>' : '') +
+                    (trailer || '') +
                 '</section>';
             }
-            viewInstalled.innerHTML = section('Claude Code Skills', targetDesc('code'), codeSkills) + section('Claude Skills', targetDesc('claude'), claudeSkills);
+            viewInstalled.innerHTML = section('Claude Code Skills', targetDesc('code'), codeSkills, '') +
+                section('Claude Skills', targetDesc('claude'), claudeSkills, claudeSyncTrailer());
+            bindSyncButtons();
+            viewInstalled.querySelectorAll('[data-detail-path]').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    if (window.openSkillDetail) window.openSkillDetail({ local: true, path: b.getAttribute('data-detail-path'), name: b.getAttribute('data-detail-name'), title: b.getAttribute('data-detail-name') });
+                });
+            });
             viewInstalled.querySelectorAll('[data-inst-github]').forEach(function (b) {
                 b.addEventListener('click', function () { api.openExternal(b.getAttribute('data-url')); });
             });
@@ -505,6 +649,38 @@
             if (state.tab === 'installed') renderInstalled();
         }
 
+        function bindSyncButtons() {
+            const re = document.getElementById('claude-resync');
+            if (re) re.addEventListener('click', function () { syncClaudeSkills(true); });
+            const ow = document.getElementById('claude-open-web');
+            if (ow) ow.addEventListener('click', function () { api.openExternal('https://claude.ai/customize/skills'); });
+            const si = document.getElementById('claude-signin');
+            if (si) si.addEventListener('click', async function () {
+                si.textContent = 'Opening…';
+                try { await api.claudeLogin(); } catch (e) { /* ignore */ }
+                claudeSync = 'idle';
+                syncClaudeSkills(true);
+            });
+        }
+
+        async function syncClaudeSkills(force) {
+            if (!api || !api.listClaudeSkills) return;
+            if (claudeSync === 'loading') return;
+            if (!force && claudeSync === 'done') return;
+            claudeSync = 'loading';
+            if (state.tab === 'installed') renderInstalled();
+            try {
+                const res = await Promise.race([
+                    api.listClaudeSkills(),
+                    new Promise(function (r) { window.setTimeout(function () { r({ timeout: true }); }, 25000); })
+                ]);
+                if (res && res.timeout) { claudeSync = 'done'; }
+                else if (res && res.needLogin) { claudeAccountSkills = []; claudeSync = 'needlogin'; }
+                else { claudeAccountSkills = (res && res.skills) || []; claudeSync = 'done'; }
+            } catch (e) { claudeSync = 'done'; }
+            if (state.tab === 'installed') renderInstalled();
+        }
+
         function syncTabs() {
             tabs.forEach(function (t) {
                 const active = t.getAttribute('data-tab') === state.tab;
@@ -521,7 +697,7 @@
             viewInstalled.classList.toggle('hidden', onExplore);
             exploreActions.classList.toggle('hidden', !onExplore);
             if (onExplore) render();
-            else { loadInstalled(); renderInstalled(); }
+            else { loadInstalled(); renderInstalled(); syncClaudeSkills(false); }
         }
 
         function render() {
@@ -565,10 +741,69 @@
             resizeTimer = setTimeout(layoutCategories, 150);
         });
 
+        setupAccount();
         setupSettings(load);
         syncTabs();
         loadInstalled();
         load(false);
+
+        function setupAccount() {
+            const panel = document.getElementById('account');
+            const body = document.getElementById('account-body');
+            const backdrop = panel.querySelector('[data-account-backdrop]');
+
+            function spinnerRow(text) {
+                return '<div class="flex items-center justify-center gap-3 py-6 text-sm text-[#6F6C63] dark:text-[#A6A296]"><i class="fa-solid fa-spinner fa-spin"></i>' + esc(text) + '</div>';
+            }
+            function render(status) {
+                const inIcon = '<span class="grid h-12 w-12 shrink-0 place-content-center rounded-full bg-[#C96442]/12 text-[#C96442] dark:bg-[#D97757]/15 dark:text-[#D97757]">' + svgClaude('h-6 w-6') + '</span>';
+                if (status.loggedIn) {
+                    body.innerHTML =
+                        '<div class="flex items-center gap-4">' + inIcon +
+                            '<div class="min-w-0"><p class="flex items-center gap-2 font-semibold"><span class="h-2 w-2 rounded-full bg-emerald-500"></span>Signed in</p>' +
+                            '<p class="mt-0.5 text-sm text-[#6F6C63] dark:text-[#A6A296]">Skills install to your Claude account automatically.</p></div>' +
+                        '</div>' +
+                        '<button id="account-signout" class="mt-6 w-full rounded-xl border border-[#E7E4DA] py-2.5 text-sm font-semibold text-[#6F6C63] transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-600 active:scale-[0.99] dark:border-white/10 dark:text-[#A6A296]"><i class="fa-solid fa-right-from-bracket mr-2"></i>Sign out</button>';
+                    document.getElementById('account-signout').addEventListener('click', signOut);
+                } else {
+                    body.innerHTML =
+                        '<div class="flex items-center gap-4">' +
+                            '<span class="grid h-12 w-12 shrink-0 place-content-center rounded-full bg-black/5 text-[#9C988D] dark:bg-white/10">' + svgClaude('h-6 w-6') + '</span>' +
+                            '<div class="min-w-0"><p class="flex items-center gap-2 font-semibold"><span class="h-2 w-2 rounded-full bg-[#C9C4B6] dark:bg-[#4A4641]"></span>Not signed in</p>' +
+                            '<p class="mt-0.5 text-sm text-[#6F6C63] dark:text-[#A6A296]">Sign in to install skills to Claude and sync your account.</p></div>' +
+                        '</div>' +
+                        '<button id="account-signin" class="mt-6 w-full rounded-xl bg-[#C96442] py-2.5 text-sm font-semibold text-white transition hover:bg-[#b4583a] active:scale-[0.99] dark:bg-[#D97757]"><i class="fa-solid fa-right-to-bracket mr-2"></i>Sign in to Claude</button>';
+                    document.getElementById('account-signin').addEventListener('click', signIn);
+                }
+            }
+            async function refresh() {
+                body.innerHTML = spinnerRow('Checking…');
+                try { render(await api.claudeAccountStatus() || { loggedIn: false }); }
+                catch (e) { render({ loggedIn: false }); }
+            }
+            async function signIn() {
+                body.innerHTML = spinnerRow('Opening Claude…');
+                try { await api.claudeLogin(); } catch (e) { /* ignore */ }
+                claudeSync = 'idle';
+                syncClaudeSkills(true);
+                refresh();
+            }
+            async function signOut() {
+                body.innerHTML = spinnerRow('Signing out…');
+                try { await api.claudeSignOut(); } catch (e) { /* ignore */ }
+                claudeAccountSkills = [];
+                claudeSync = 'idle';
+                if (state.tab === 'installed') renderInstalled();
+                refresh();
+            }
+            function open() { panel.classList.remove('hidden'); refresh(); }
+            function close() { panel.classList.add('hidden'); }
+
+            document.getElementById('btn-account').addEventListener('click', open);
+            document.getElementById('account-close').addEventListener('click', close);
+            backdrop.addEventListener('click', close);
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.classList.contains('hidden')) close(); });
+        }
     })();
 
     function setupSettings(reload) {
@@ -615,6 +850,121 @@
         });
         input.addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('repo-add').click(); });
     }
+</script>
+
+<script>
+    (function () {
+        const api = window.skiller;
+        const overlay = document.getElementById('detail');
+        const titleEl = document.getElementById('detail-title');
+        const subEl = document.getElementById('detail-sub');
+        const filesEl = document.getElementById('detail-files');
+        const contentEl = document.getElementById('detail-content');
+        const ghBtn = document.getElementById('detail-github');
+        let current = { files: [], activeRel: null };
+
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+        function iconFor(f) {
+            if (/^skill\.md$/i.test(f.rel)) return 'fa-solid fa-star text-[#C96442] dark:text-[#D97757]';
+            if (f.type === 'image') return 'fa-regular fa-image';
+            if (f.type === 'html') return 'fa-brands fa-html5';
+            if (f.type === 'markdown') return 'fa-regular fa-file-lines';
+            if (f.type === 'binary') return 'fa-regular fa-file';
+            if (['js', 'mjs', 'cjs', 'ts', 'tsx', 'jsx', 'py', 'sh', 'bash', 'rb', 'go', 'rs', 'java', 'c', 'cpp', 'h', 'php', 'lua', 'sql'].indexOf(f.ext) >= 0) return 'fa-solid fa-code';
+            if (['json', 'jsonc', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'xml', 'env'].indexOf(f.ext) >= 0) return 'fa-solid fa-gear';
+            return 'fa-regular fa-file-lines';
+        }
+        function renderFileList() {
+            filesEl.innerHTML = current.files.map(function (f) {
+                const active = f.rel === current.activeRel;
+                return '<button data-rel="' + esc(f.rel) + '" class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition ' +
+                    (active ? 'bg-[#C96442]/10 font-medium text-[#C96442] dark:bg-[#D97757]/15 dark:text-[#D97757]' : 'text-[#6F6C63] hover:bg-black/5 dark:text-[#A6A296] dark:hover:bg-white/5') + '">' +
+                    '<i class="' + iconFor(f) + ' w-4 shrink-0 text-center text-xs"></i>' +
+                    '<span class="truncate" title="' + esc(f.rel) + '">' + esc(f.rel) + '</span></button>';
+            }).join('');
+            filesEl.querySelectorAll('[data-rel]').forEach(function (b) {
+                b.addEventListener('click', function () { showFile(b.getAttribute('data-rel')); });
+            });
+        }
+        function parseFrontmatter(text) {
+            if (!/^---\r?\n/.test(text)) return { meta: {}, body: text };
+            const end = text.indexOf('\n---', 4);
+            if (end < 0) return { meta: {}, body: text };
+            const fm = text.slice(text.indexOf('\n') + 1, end);
+            const body = text.slice(end + 4).replace(/^\r?\n/, '');
+            const meta = {};
+            fm.split(/\r?\n/).forEach(function (line) {
+                const m = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+                if (m) meta[m[1].toLowerCase()] = m[2].trim().replace(/^["']|["']$/g, '');
+            });
+            return { meta: meta, body: body };
+        }
+        function metaPill(label, val) {
+            return '<span class="inline-flex items-center gap-1.5 rounded-full border border-[#E7E4DA] px-3 py-1 text-xs text-[#6F6C63] dark:border-white/10 dark:text-[#A6A296]"><span class="font-semibold text-[#9C988D]">' + esc(label) + '</span>' + esc(val) + '</span>';
+        }
+        function metaHeader(meta) {
+            const desc = meta.description ? '<p class="text-[15px] leading-relaxed text-[#6F6C63] dark:text-[#A6A296]">' + esc(meta.description) + '</p>' : '';
+            const pills = [];
+            if (meta.version) pills.push(metaPill('Version', meta.version));
+            if (meta['allowed-tools']) pills.push(metaPill('Tools', meta['allowed-tools']));
+            if (meta.license) pills.push(metaPill('License', meta.license));
+            const row = pills.length ? '<div class="mt-4 flex flex-wrap gap-2">' + pills.join('') + '</div>' : '';
+            if (!desc && !row) return '';
+            return '<div class="mb-8 border-b border-[#E7E4DA] pb-8 dark:border-white/10">' + desc + row + '</div>';
+        }
+        function mdHTML(text, isSkill) {
+            const fm = parseFrontmatter(text);
+            let html;
+            try { html = window.marked ? window.marked.parse(fm.body) : esc(fm.body); } catch (e) { html = esc(fm.body); }
+            if (window.DOMPurify) html = window.DOMPurify.sanitize(html);
+            const header = isSkill ? metaHeader(fm.meta) : '';
+            return '<div class="mx-auto max-w-3xl px-7 py-9">' + header + '<div class="md-body">' + html + '</div></div>';
+        }
+        function showFile(rel) {
+            const f = current.files.find(function (x) { return x.rel === rel; });
+            if (!f) return;
+            current.activeRel = rel;
+            renderFileList();
+            if (f.type === 'markdown') contentEl.innerHTML = mdHTML(f.text || '', /^skill\.md$/i.test(rel));
+            else if (f.type === 'image') contentEl.innerHTML = '<div class="flex min-h-full items-center justify-center p-10"><img src="' + f.dataUrl + '" alt="' + esc(rel) + '" class="max-h-[82vh] max-w-full rounded-xl shadow-[0_20px_60px_-20px_rgba(31,30,29,0.35)]" /></div>';
+            else if (f.type === 'html') contentEl.innerHTML = '<iframe sandbox="" class="h-full w-full border-0 bg-white" srcdoc="' + esc(f.text || '') + '"></iframe>';
+            else if (f.type === 'text') contentEl.innerHTML = '<div class="p-7"><pre class="overflow-x-auto rounded-2xl bg-[#1F1E1D] p-5 text-xs leading-relaxed text-[#F2EFE7] dark:bg-[#0F0E0D]"><code>' + esc(f.text || '') + '</code></pre></div>';
+            else contentEl.innerHTML = '<div class="flex min-h-full flex-col items-center justify-center gap-3 p-10 text-center text-[#9C988D]"><i class="fa-regular fa-file text-3xl"></i><p class="text-sm">' + esc(rel) + '</p><p class="text-xs">Binary file · ' + Math.round(f.size / 1024) + ' KB</p></div>';
+            contentEl.scrollTop = 0;
+        }
+        function close() { overlay.classList.add('hidden'); contentEl.innerHTML = ''; filesEl.innerHTML = ''; current = { files: [], activeRel: null }; }
+        async function open(skill) {
+            overlay.classList.remove('hidden');
+            titleEl.textContent = skill.title || skill.name || 'Skill';
+            const bits = [];
+            if (skill.categoryLabel) bits.push(skill.categoryLabel);
+            if (skill.source && skill.source.full) bits.push(skill.source.full);
+            if (!bits.length && skill.local) bits.push('Installed in Claude Code');
+            subEl.textContent = bits.join('  ·  ');
+            if (skill.htmlUrl) { ghBtn.classList.remove('hidden'); ghBtn.onclick = function () { api.openExternal(skill.htmlUrl); }; }
+            else ghBtn.classList.add('hidden');
+            filesEl.innerHTML = '';
+            contentEl.innerHTML = '<div class="flex min-h-full items-center justify-center gap-3 py-24 text-sm text-[#6F6C63] dark:text-[#A6A296]"><i class="fa-solid fa-spinner fa-spin"></i>Loading skill…</div>';
+            try {
+                const data = await api.getSkillFiles(skill);
+                current.files = data.files || [];
+                renderFileList();
+                const first = data.skillMdRel || (current.files[0] && current.files[0].rel);
+                if (first) showFile(first);
+                else contentEl.innerHTML = '<div class="p-10 text-center text-[#9C988D]">No files found in this skill.</div>';
+            } catch (e) {
+                contentEl.innerHTML = '<div class="flex min-h-full flex-col items-center justify-center gap-2 p-10 text-center text-[#9C988D]"><i class="fa-solid fa-triangle-exclamation text-2xl"></i><p class="text-sm">Could not load this skill.</p><p class="text-xs">' + esc((e && e.message) || '') + '</p></div>';
+            }
+        }
+        document.getElementById('detail-close').addEventListener('click', close);
+        document.getElementById('detail-back').addEventListener('click', close);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.classList.contains('hidden')) close(); });
+        window.openSkillDetail = open;
+    })();
 </script>
 </body>
 </html>

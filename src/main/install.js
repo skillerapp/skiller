@@ -204,6 +204,73 @@ async function fetchSkillFiles(skill) {
   return files;
 }
 
+const IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico', 'bmp', 'avif'];
+const TEXT_EXT = ['md', 'markdown', 'mdx', 'txt', 'html', 'htm', 'css', 'js', 'mjs', 'cjs', 'ts', 'tsx', 'jsx', 'json', 'jsonc', 'yaml', 'yml', 'py', 'sh', 'bash', 'zsh', 'xml', 'csv', 'tsv', 'toml', 'ini', 'cfg', 'conf', 'env', 'rb', 'go', 'rs', 'java', 'kt', 'c', 'cc', 'cpp', 'h', 'hpp', 'php', 'sql', 'lua', 'r', 'swift', 'gradle', 'dockerfile', 'gitignore', 'log'];
+const MAX_TEXT = 800000;
+
+function fileEntry(rel, buffer) {
+  const lower = rel.toLowerCase();
+  const base = lower.split('/').pop();
+  const ext = base.indexOf('.') >= 0 ? base.split('.').pop() : '';
+  const out = { rel: rel, ext: ext, size: buffer.length, type: 'binary', text: null, dataUrl: null };
+  if (IMAGE_EXT.indexOf(ext) >= 0) {
+    out.type = 'image';
+    const mime = ext === 'svg' ? 'image/svg+xml' : (ext === 'ico' ? 'image/x-icon' : 'image/' + (ext === 'jpg' ? 'jpeg' : ext));
+    out.dataUrl = 'data:' + mime + ';base64,' + buffer.toString('base64');
+  } else if (TEXT_EXT.indexOf(ext) >= 0 || ext === '' || base === 'license' || base === 'readme') {
+    out.type = (ext === 'md' || ext === 'markdown' || ext === 'mdx') ? 'markdown' : (ext === 'html' || ext === 'htm' ? 'html' : 'text');
+    out.text = buffer.length <= MAX_TEXT ? buffer.toString('utf8') : '(file too large to preview)';
+  }
+  return out;
+}
+
+function readDirFiles(dir) {
+  const out = [];
+  (function walk(d) {
+    let entries;
+    try { entries = fs.readdirSync(d, { withFileTypes: true }); } catch (e) { return; }
+    entries.forEach(function (e) {
+      const full = path.join(d, e.name);
+      if (e.name === '.DS_Store' || e.name === 'Thumbs.db') return;
+      if (e.isDirectory()) { if (e.name !== '.git') walk(full); }
+      else {
+        try {
+          const rel = path.relative(dir, full).split(path.sep).join('/');
+          out.push(fileEntry(rel, fs.readFileSync(full)));
+        } catch (err) { /* ignore unreadable */ }
+      }
+    });
+  })(dir);
+  return out;
+}
+
+function sortFiles(files) {
+  files.sort(function (a, b) {
+    const am = /^skill\.md$/i.test(a.rel) ? 0 : 1;
+    const bm = /^skill\.md$/i.test(b.rel) ? 0 : 1;
+    if (am !== bm) return am - bm;
+    const ad = a.rel.indexOf('/'), bd = b.rel.indexOf('/');
+    if ((ad >= 0) !== (bd >= 0)) return ad >= 0 ? 1 : -1;
+    return a.rel.toLowerCase().localeCompare(b.rel.toLowerCase());
+  });
+  return files;
+}
+
+async function getSkillFiles(skill) {
+  let files;
+  if (skill && skill.local && skill.path && fs.existsSync(skill.path)) {
+    files = readDirFiles(skill.path);
+  } else {
+    const raw = await fetchSkillFiles(skill);
+    files = raw
+      .filter(function (f) { const b = f.rel.split('/').pop(); return b !== '.DS_Store' && b !== 'Thumbs.db'; })
+      .map(function (f) { return fileEntry(f.rel, f.buffer); });
+  }
+  sortFiles(files);
+  const md = files.find(function (f) { return /^skill\.md$/i.test(f.rel); });
+  return { files: files, skillMd: (md && md.text) || '', skillMdRel: (md && md.rel) || null };
+}
+
 function safeName(name) {
   return String(name || 'skill').toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'skill';
 }
@@ -292,14 +359,15 @@ async function exportZipForClaude(skill) {
   let dest = path.join(dir, name + '.zip');
   try { fs.mkdirSync(dir, { recursive: true }); } catch (e) { dest = path.join(os.tmpdir(), name + '.zip'); }
   fs.writeFileSync(dest, zip);
-  const result = { ok: true, path: dest, fileCount: files.length, settingsUrl: 'https://claude.ai/customize/skills' };
-  recordInstall(skill, 'claude', result);
-  return result;
+  // Claude installs are not tracked locally — they live on the account and are
+  // read back via claude-install.listClaudeSkills().
+  return { ok: true, path: dest, fileCount: files.length, settingsUrl: 'https://claude.ai/customize/skills' };
 }
 
 module.exports = {
   installToClaudeCode: installToClaudeCode,
   exportZipForClaude: exportZipForClaude,
   listInstalled: listInstalled,
-  uninstall: uninstall
+  uninstall: uninstall,
+  getSkillFiles: getSkillFiles
 };

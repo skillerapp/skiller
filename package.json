@@ -1,9 +1,38 @@
 {
+  "name": "skiller",
+  "productName": "Skiller",
+  "version": "1.0.0",
+  "description": "Browse and install Claude skills",
+  "author": "Jimi",
+  "main": "index.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.skiller.app",
+    "productName": "Skiller",
+    "files": [
+      "index.js",
+      "preload.js",
+      "src/**/*"
+    ],
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "identity": null,
+      "hardenedRuntime": false
+    }
   },
   "dependencies": {
-    "custom-electron-titlebar": "^4.4.1",
-    "electron": "^42.3.0"
+    "custom-electron-titlebar": "^4.4.1"
+  },
+  "devDependencies": {
+    "electron": "^42.3.0",
+    "electron-builder": "^26.8.1"
   }
 }

@@ -34,7 +34,13 @@ contextBridge.exposeInMainWorld('skiller', {
   installCode: function (skill) { return ipcRenderer.invoke('install:code', skill); },
   installClaude: function (skill) { return ipcRenderer.invoke('install:claude', skill); },
   listInstalled: function () { return ipcRenderer.invoke('installed:list'); },
+  getSkillFiles: function (skill) { return ipcRenderer.invoke('skill:files', skill); },
   uninstall: function (key) { return ipcRenderer.invoke('installed:remove', key); },
   revealPath: function (p) { return ipcRenderer.invoke('reveal:path', p); },
+  listClaudeSkills: function () { return ipcRenderer.invoke('claude:listSkills'); },
+  claudeLogin: function () { return ipcRenderer.invoke('claude:login'); },
+  claudeAccountStatus: function () { return ipcRenderer.invoke('claude:accountStatus'); },
+  claudeSignOut: function () { return ipcRenderer.invoke('claude:signOut'); },
+  onClaudeStatus: function (cb) { ipcRenderer.on('claude:status', function (e, data) { cb(data); }); },
   openExternal: function (url) { return ipcRenderer.invoke('open:external', url); }
 });

@@ -34,6 +34,17 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, 'src/render', 'index.html'));
   attachTitlebarToWindow(win);
+
+  win.webContents.setWindowOpenHandler(function (details) {
+    if (/^https?:\/\//.test(details.url)) shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
+  win.webContents.on('will-navigate', function (e, url) {
+    if (!/^file:\/\//.test(url)) {
+      e.preventDefault();
+      if (/^https?:\/\//.test(url)) shell.openExternal(url);
+    }
+  });
 }
 
 ipcMain.handle('settings:get', function () {
@@ -64,12 +75,38 @@ ipcMain.handle('install:code', async function (e, skill) {
 
 ipcMain.handle('install:claude', async function (e, skill) {
   const res = await install.exportZipForClaude(skill);
-  if (res && res.path) await claudeInstall.installToClaude(res.path);
+  if (res && res.path) await claudeInstall.installToClaude(res.path, e.sender);
   return res;
+});
+
+ipcMain.handle('claude:listSkills', async function () {
+  console.log('[claude-install] IPC claude:listSkills received');
+  try {
+    return await claudeInstall.listClaudeSkills();
+  } catch (e) {
+    console.log('[claude-install] listSkills threw:', e && e.message);
+    return { needLogin: false, skills: [] };
+  }
+});
+
+ipcMain.handle('claude:login', async function () {
+  return claudeInstall.ensureLogin();
+});
+
+ipcMain.handle('claude:accountStatus', async function () {
+  return claudeInstall.accountStatus();
+});
+
+ipcMain.handle('claude:signOut', async function () {
+  return claudeInstall.signOut();
 });
 
 ipcMain.handle('installed:list', function () {
   return install.listInstalled();
+});
+
+ipcMain.handle('skill:files', async function (e, skill) {
+  return install.getSkillFiles(skill);
 });
 
 ipcMain.handle('installed:remove', function (e, key) {

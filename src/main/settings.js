@@ -7,7 +7,9 @@ const DEFAULTS = {
     'anthropics/skills',
     'alirezarezvani/claude-skills',
     'OneWave-AI/claude-skills',
-    'wondelai/skills'
+    'wondelai/skills',
+    'ComposioHQ/awesome-claude-skills',
+    'skillerapp/skills'
   ],
   ttlMinutes: 60
 };
