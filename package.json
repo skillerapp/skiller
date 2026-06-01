@@ -3,6 +3,7 @@
     "start": "electron ."
   },
   "dependencies": {
+    "custom-electron-titlebar": "^4.4.1",
     "electron": "^42.3.0"
   }
 }

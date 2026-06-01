@@ -1,4 +1,30 @@
 const { contextBridge, ipcRenderer } = require('electron');
+const { Titlebar, TitlebarColor } = require('custom-electron-titlebar');
+
+function appBgHex() {
+  const c = getComputedStyle(document.body).backgroundColor;
+  const m = c && c.match(/\d+/g);
+  if (!m) return '#F5F4EE';
+  return '#' + m.slice(0, 3).map(function (n) { return ('0' + parseInt(n, 10).toString(16)).slice(-2); }).join('');
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const bar = new Titlebar({
+    backgroundColor: TitlebarColor.fromHex(appBgHex()),
+    itemBackgroundColor: TitlebarColor.fromHex(mq.matches ? '#1D1C1A' : '#F4F3ED'),
+    titleHorizontalAlignment: 'center',
+    iconSize: 18,
+    icon: '../img/icon.svg',
+    maximizable: true
+  });
+  mq.addEventListener('change', function () {
+    requestAnimationFrame(function () {
+      bar.updateBackground(TitlebarColor.fromHex(appBgHex()));
+      bar.updateItemBGColor(TitlebarColor.fromHex(mq.matches ? '#1D1C1A' : '#F4F3ED'));
+    });
+  });
+});
 
 contextBridge.exposeInMainWorld('skiller', {
   getSettings: function () { return ipcRenderer.invoke('settings:get'); },

@@ -1,8 +1,21 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, Menu } = require('electron');
 const path = require('path');
+const { setupTitlebar, attachTitlebarToWindow } = require('custom-electron-titlebar/main');
 const settings = require('./src/main/settings');
 const marketplace = require('./src/main/marketplace');
 const install = require('./src/main/install');
+
+setupTitlebar();
+
+if (process.platform === 'darwin') {
+  Menu.setApplicationMenu(Menu.buildFromTemplate([
+    { role: 'appMenu' },
+    { role: 'editMenu' },
+    { role: 'windowMenu' }
+  ]));
+} else {
+  Menu.setApplicationMenu(null);
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -10,12 +23,16 @@ function createWindow() {
     height: 720,
     minWidth: 1270,
     minHeight: 720,
+    titleBarStyle: 'hidden',
+    backgroundColor: '#F5F4EE',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      sandbox: false,
     },
   });
 
   win.loadFile(path.join(__dirname, 'src/render', 'index.html'));
+  attachTitlebarToWindow(win);
 }
 
 ipcMain.handle('settings:get', function () {

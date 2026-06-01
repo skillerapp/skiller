@@ -28,8 +28,10 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        html { overflow-y: scroll; }
         body { font-optical-sizing: auto; }
+        .cet-container { overflow-y: scroll !important; }
+        .cet-titlebar { z-index: 70; }
+        @media (prefers-color-scheme: dark) { .cet-icon { filter: invert(1) brightness(1.7); } }
         .grain::before {
             content: "";
             position: fixed;
@@ -163,6 +165,13 @@
         const TAB_ACTIVE = 'bg-black/[0.07] text-[#1F1E1D] dark:bg-white/10 dark:text-[#F2EFE7]';
         const TAB_IDLE = 'text-[#6F6C63] hover:text-[#1F1E1D] dark:text-[#A6A296] dark:hover:text-[#F2EFE7]';
 
+        function svgCode(cls) {
+            return '<svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" aria-hidden="true" class="' + cls + '"><path d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"/></svg>';
+        }
+        function svgClaude(cls) {
+            return '<svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" aria-hidden="true" class="' + cls + '"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"/></svg>';
+        }
+
         const PILL_ACTIVE = 'bg-[#C96442] text-white border-[#C96442] dark:bg-[#D97757] dark:border-[#D97757]';
         const PILL_IDLE = 'bg-white text-[#6F6C63] border-[#E7E4DA] hover:border-[#C96442]/40 hover:text-[#C96442] dark:bg-[#252320] dark:text-[#A6A296] dark:border-white/10 dark:hover:border-[#D97757]/40 dark:hover:text-[#D97757]';
 
@@ -266,8 +275,8 @@
                             '<div class="relative" data-install-root data-idx="' + i + '">' +
                             '<button data-install-toggle class="inline-flex items-center gap-1 rounded-full bg-[#C96442] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b4583a] active:scale-95 dark:bg-[#D97757] dark:hover:bg-[#c96846]">Install<i class="fa-solid fa-chevron-down text-[9px]"></i></button>' +
                             '<div data-install-menu class="absolute bottom-full right-0 z-20 mb-2 hidden w-44 overflow-hidden rounded-xl border border-[#E7E4DA] bg-white shadow-xl dark:border-white/10 dark:bg-[#2A2724]">' +
-                                '<button data-install-code class="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:hover:bg-white/5"><i class="fa-solid fa-terminal w-4 text-[#9C988D]"></i>Claude Code</button>' +
-                                '<button data-install-claude class="flex w-full items-center gap-2 border-t border-[#E7E4DA] px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:border-white/10 dark:hover:bg-white/5"><i class="fa-regular fa-comment-dots w-4 text-[#9C988D]"></i>Claude</button>' +
+                                '<button data-install-code class="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:hover:bg-white/5">' + svgCode('h-4 w-4 shrink-0 text-[#6F6C63] dark:text-[#A6A296]') + 'Claude Code</button>' +
+                                '<button data-install-claude class="flex w-full items-center gap-2 border-t border-[#E7E4DA] px-3 py-2.5 text-left text-xs font-medium transition hover:bg-[#F5F4EE] dark:border-white/10 dark:hover:bg-white/5">' + svgClaude('h-4 w-4 shrink-0 text-[#6F6C63] dark:text-[#A6A296]') + 'Claude</button>' +
                             '</div>' +
                         '</div>' +
                         '</div>' +
@@ -337,8 +346,8 @@
         }
 
         function targetMeta(target) {
-            if (target === 'code') return { icon: 'fa-solid fa-terminal', label: 'Claude Code' };
-            return { icon: 'fa-regular fa-comment-dots', label: 'Claude' };
+            if (target === 'code') return { svg: svgCode('h-3 w-3 shrink-0'), label: 'Claude Code' };
+            return { svg: svgClaude('h-3 w-3 shrink-0'), label: 'Claude' };
         }
 
         function installedCardHTML(r, i) {
@@ -349,7 +358,7 @@
                 '<article class="group flex animate-rise flex-col rounded-2xl border border-[#E7E4DA] bg-white p-5 transition duration-300 hover:border-[#C96442]/40 dark:border-white/10 dark:bg-[#252320] dark:hover:border-[#D97757]/40" style="animation-delay:' + Math.min(i * 35, 400) + 'ms">' +
                     '<div class="flex items-start justify-between gap-3">' +
                         '<h3 class="min-w-0 truncate font-serif text-lg leading-tight" title="' + esc(r.title) + '">' + esc(r.title) + '</h3>' +
-                        '<span class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E4DA] px-2.5 py-1 text-[11px] font-medium text-[#6F6C63] dark:border-white/10 dark:text-[#A6A296]"><i class="' + meta.icon + ' text-[10px]"></i>' + esc(meta.label) + '</span>' +
+                        '<span class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E4DA] px-2.5 py-1 text-[11px] font-medium text-[#6F6C63] dark:border-white/10 dark:text-[#A6A296]">' + meta.svg + esc(meta.label) + '</span>' +
                     '</div>' +
                     '<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#C96442] dark:text-[#D97757]">' + esc(r.categoryLabel) + '</p>' +
                     '<p class="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-[#6F6C63] dark:text-[#A6A296]">' + esc(r.description || 'No description provided.') + '</p>' +
